@@ -31,7 +31,9 @@ class WebSocketTransport extends Transport {
     const notifications = getNotifications(data);
     this.connection.send(JSON.stringify(this.parseData(data)), (err?: Error) => {
       if (err) {
-        const jsonError = new JSONRPCError(err.message, ERR_UNKNOWN, err);
+        const jsonError = err instanceof JSONRPCError
+          ? err
+          : new JSONRPCError(e.message, ERR_UNKNOWN, err);
         this.transportRequestManager.settlePendingRequest(notifications, jsonError);
         this.transportRequestManager.settlePendingRequest(getBatchRequests(data), jsonError);
         prom = Promise.reject(jsonError);
